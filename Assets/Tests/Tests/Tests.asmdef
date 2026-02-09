@@ -1,0 +1,6 @@
+{
+    "name": "TestsNested_Removed",
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}
