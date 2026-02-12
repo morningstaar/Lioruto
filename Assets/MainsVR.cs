@@ -4,6 +4,7 @@ public class MainsVR : MonoBehaviour
 {
     public TirMascotte scriptMascotte;
     public GameObject effetConfettis; 
+    public GameManager gameManager;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -11,7 +12,10 @@ public class MainsVR : MonoBehaviour
         if (collision.gameObject.CompareTag("Ballon"))
         {
             Debug.Log("ARRÊT !");
-            
+
+            if (gameManager != null && !gameManager.TryResolveShot(true))
+                return;
+
             if (scriptMascotte != null) 
                 scriptMascotte.AjouterPoints(400); // +400 pour l'arrêt
 
@@ -21,7 +25,8 @@ public class MainsVR : MonoBehaviour
                 Instantiate(effetConfettis, contact.point, Quaternion.identity);
             }
 
-            scriptMascotte.Invoke("ReplacerBallon", 1.0f);
+            if (scriptMascotte != null)
+                scriptMascotte.Invoke("ReplacerBallon", 1.0f);
         }
     }
 }
