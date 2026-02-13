@@ -2,18 +2,30 @@ using UnityEngine;
 
 public class MainsVR : MonoBehaviour
 {
-    public TirMascotte scriptTir; 
-    public GameObject canvasQuiz; // Case à remplir dans l'inspecteur
+    public TirMascotte scriptMascotte;
+    public GameObject effetConfettis;
+    public GameManager gameManager;
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ballon"))
         {
-            Debug.Log("ARRÊT ! Affichage du Quiz...");
-            if (canvasQuiz != null) canvasQuiz.SetActive(true);
-            
-            // On ajoute les 400 points de l'arrêt
-            if (scriptTir != null) scriptTir.AjouterPoints(400);
+            Debug.Log("ARRÊT !");
+
+            if (gameManager != null && !gameManager.TryResolveShot(true))
+                return;
+
+            if (scriptMascotte != null)
+                scriptMascotte.AjouterPoints(400); // +400 pour l'arrêt
+
+            if (effetConfettis != null)
+            {
+                ContactPoint contact = collision.contacts[0];
+                Instantiate(effetConfettis, contact.point, Quaternion.identity);
+            }
+
+            if (scriptMascotte != null)
+                scriptMascotte.Invoke("ReplacerBallon", 1.0f);
         }
     }
 }

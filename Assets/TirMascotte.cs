@@ -53,6 +53,14 @@ public class TirMascotte : MonoBehaviour
     public void AjouterPoints(int points)
     {
         scoreTotal += points;
-        texteScore.text = "Score : " + scoreTotal;
+        if (texteScore != null)
+            texteScore.text = "Score : " + scoreTotal;
+    }
+
+    public void ResetScore()
+    {
+        scoreTotal = 0;
+        if (texteScore != null)
+            texteScore.text = "Score : " + scoreTotal;
     }
 }
