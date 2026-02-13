@@ -9,25 +9,11 @@ public class MainsVR : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Ballon"))
         {
-            // 1. On affiche l'interface du Quiz
-            if (canvasQuiz != null)
-            {
-                canvasQuiz.SetActive(true);
-            }
-
-            // 2. On ajoute les points
-            if (scriptTir != null)
-            {
-                scriptTir.AjouterPoints(400);
-            }
-
-            // 3. On arrête le ballon pour laisser le joueur lire
-            Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
-            if (rb != null)
-            {
-                rb.velocity = Vector3.zero;
-                rb.isKinematic = true; // Empêche le ballon de bouger pendant le quiz
-            }
+            Debug.Log("ARRÊT ! Affichage du Quiz...");
+            if (canvasQuiz != null) canvasQuiz.SetActive(true);
+            
+            // On ajoute les 400 points de l'arrêt
+            if (scriptTir != null) scriptTir.AjouterPoints(400);
         }
     }
 }
