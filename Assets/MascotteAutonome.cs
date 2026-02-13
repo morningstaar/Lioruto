@@ -1,3 +1,4 @@
+
 using UnityEngine;
 
 public class MascotteAutonome : MonoBehaviour
@@ -6,7 +7,7 @@ public class MascotteAutonome : MonoBehaviour
     public Transform pointDeTir;
     public Transform cibleBut;
     public Animator animator;
-    
+   
     public float vitesseCourse = 3.0f;
     private bool enTrainDeCourir = false;
 
@@ -14,12 +15,14 @@ public class MascotteAutonome : MonoBehaviour
     {
         // On attend 2 secondes avant de commencer à courir
         Invoke("DemarrerCourse", 2f);
+        animator = GetComponent<Animator>();
+        animator.SetBool("isRunning", true);
     }
 
     void DemarrerCourse()
     {
         enTrainDeCourir = true;
-        animator.SetBool("isRunning", true); // Assure-toi que ce paramètre existe dans l'Animator
+        animator.SetBool("isRunning", true); 
     }
 
     void Update()
@@ -29,9 +32,10 @@ public class MascotteAutonome : MonoBehaviour
             // Naruto avance vers le point où le ballon doit être tiré
             float distance = Vector3.Distance(transform.position, rbBallon.transform.position);
 
-            if (distance > 0.5f) // S'il est encore loin du ballon
+            if (distance < 0.5f) // S'il est encore loin du ballon
             {
-                transform.position = Vector3.MoveTowards(transform.position, rbBallon.transform.position, vitesseCourse * Time.deltaTime);
+                TerminerCourseEtTirer();
+                // transform.position = Vector3.MoveTowards(transform.position, rbBallon.transform.position, vitesseCourse * Time.deltaTime);
             }
             else // S'il est arrivé au ballon
             {
@@ -44,8 +48,8 @@ public class MascotteAutonome : MonoBehaviour
     {
         enTrainDeCourir = false;
         animator.SetBool("isRunning", false);
-        animator.SetTrigger("kick"); // Lance l'animation de tir
-        
+        animator.SetTrigger("Kick"); // Lance l'animation de tir
+       
         // On attend la fin de l'animation de jambe pour donner la force (0.2s)
         Invoke("AppliquerForceBallon", 0.2f);
     }
@@ -55,7 +59,7 @@ public class MascotteAutonome : MonoBehaviour
         rbBallon.isKinematic = false;
         Vector3 direction = (cibleBut.position - rbBallon.transform.position).normalized;
         rbBallon.AddForce(direction * 22f, ForceMode.Impulse);
-        
+       
         // Affiche le quiz après le tir
         Invoke("OuvrirQuiz", 1.5f);
     }
