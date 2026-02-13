@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class DetecteurBut : MonoBehaviour
 {
-    public GameObject canvasQuiz;
+    public GameManager gameManager;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -10,7 +10,8 @@ public class DetecteurBut : MonoBehaviour
         if (other.CompareTag("Ballon"))
         {
             Debug.Log("BUT ! Affichage du Quiz...");
-            if (canvasQuiz != null) canvasQuiz.SetActive(true);
+            if (gameManager != null)
+                gameManager.TryResolveShot(false);
         }
     }
 }

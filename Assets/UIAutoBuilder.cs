@@ -116,6 +116,7 @@ public class UIAutoBuilder : MonoBehaviour
             answerButton.gameManager = gameManager;
             answerButton.indexReponse = i;
             answerButton.confirmerAuClic = false;
+            btn.onClick.AddListener(answerButton.OnClick);
         }
 
         var boutonContinuerQuestion = CreerBouton(panelQuestion.transform, "CONTINUER", new Vector2(230, 55), new Vector2(0, -210), boutonPrincipal);
