@@ -37,6 +37,7 @@ public class GameManager : MonoBehaviour
     [Header("Entrées (clavier/joystick)")]
     public KeyCode touchePause = KeyCode.Y;
     public KeyCode toucheConfirmer = KeyCode.X;
+    public bool debugQuestionAvecQ = true;
 
     [Header("Mascotte")]
     public Animator mascotteAnimator;
@@ -63,6 +64,12 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
+        if (tirMascotte == null)
+            tirMascotte = Object.FindAnyObjectByType<TirMascotte>();
+
+        if (questions == null || questions.Count == 0)
+            InitialiserQuestionsParDefaut();
+
         if (panelRegles1 != null || panelRegles2 != null || panelQuestion != null)
             InitialiserUI();
     }
@@ -72,6 +79,12 @@ public class GameManager : MonoBehaviour
         if (tirsEffectues > 0 && Input.GetKeyDown(touchePause))
         {
             BasculerPause();
+        }
+
+        if (debugQuestionAvecQ && Input.GetKeyDown(KeyCode.Q))
+        {
+            Debug.Log("[GameManager] Q appuyé → AfficherQuestion()");
+            AfficherQuestion();
         }
 
         if (panelQuestion != null && panelQuestion.activeSelf && indexReponseSelectionnee >= 0)
@@ -173,6 +186,7 @@ public class GameManager : MonoBehaviour
     {
         if (panelQuestion == null || questions.Count == 0)
         {
+            Debug.LogWarning("[GameManager] PanelQuestion manquant ou aucune question.");
             LancerProchainTir();
             return;
         }
@@ -194,6 +208,12 @@ public class GameManager : MonoBehaviour
 
         indexReponseSelectionnee = -1;
         panelQuestion.SetActive(true);
+        Debug.Log("[GameManager] PanelQuestion activé.");
+    }
+
+    public void DebugMontrerQuestion()
+    {
+        AfficherQuestion();
     }
 
     public void SelectionnerReponse(int index)
@@ -282,5 +302,17 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         var scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene();
         UnityEngine.SceneManagement.SceneManager.LoadScene(scene.buildIndex);
+    }
+
+    void InitialiserQuestionsParDefaut()
+    {
+        questions = new List<Question>
+        {
+            new Question { intitule = "Qui a remporté la Coupe du Monde 2018 ?", reponses = new[] { "Allemagne", "Argentine", "Brésil", "France" }, indexBonneReponse = 3 },
+            new Question { intitule = "Combien de joueurs par équipe sur le terrain ?", reponses = new[] { "9", "10", "11", "12" }, indexBonneReponse = 2 },
+            new Question { intitule = "Quelle durée réglementaire d’un match ?", reponses = new[] { "60 min", "80 min", "90 min", "100 min" }, indexBonneReponse = 2 },
+            new Question { intitule = "Quelle couleur de carton pour une expulsion ?", reponses = new[] { "Jaune", "Bleu", "Rouge", "Vert" }, indexBonneReponse = 2 },
+            new Question { intitule = "Qui est appelé gardien de but ?", reponses = new[] { "Le défenseur", "Le gardien", "L’attaquant", "L’arbitre" }, indexBonneReponse = 1 },
+        };
     }
 }
