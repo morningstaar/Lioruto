@@ -1,25 +1,33 @@
 using UnityEngine;
 
-public class MainVR : MonoBehaviour
+public class MainsVR : MonoBehaviour
 {
     public TirMascotte scriptTir; 
-    public GameObject canvasQuiz; // Glisse ton CanvasQuiz ici
+    public GameObject canvasQuiz; // Case à remplir dans l'inspecteur
 
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ballon"))
         {
-            Debug.Log("ARRÊT ! Score +400");
-            
-            // 1. On donne les points
-            // if (scriptTir != null) scriptTir.AjouterPoints(400);
+            // 1. On affiche l'interface du Quiz
+            if (canvasQuiz != null)
+            {
+                canvasQuiz.SetActive(true);
+            }
 
-            // // 2. On affiche le Quiz
-            // if (canvasQuiz != null) canvasQuiz.SetActive(true);
+            // 2. On ajoute les points
+            if (scriptTir != null)
+            {
+                scriptTir.AjouterPoints(400);
+            }
 
-            // // 3. On fige le ballon
-            // collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            // collision.gameObject.GetComponent<Rigidbody>().isKinematic = true;
+            // 3. On arrête le ballon pour laisser le joueur lire
+            Rigidbody rb = collision.gameObject.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.velocity = Vector3.zero;
+                rb.isKinematic = true; // Empêche le ballon de bouger pendant le quiz
+            }
         }
     }
 }
