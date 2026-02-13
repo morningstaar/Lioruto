@@ -8,10 +8,12 @@ public class GameManager : MonoBehaviour
 {
     [Header("Références gameplay")]
     public TirMascotte tirMascotte;
+    public MascotteAutonome mascotteAutonome;
     public int nombreDeTirs = 5;
     public int pointsParArret = 400;
     public int pointsBonusBonneReponseSansArret = 20;
     public int scoreMinimumPourGagner = 1000;
+    public float delaiMaxTir = 3f;
 
     [Header("UI - Panneaux")]
     public GameObject panelRegles1;
@@ -61,11 +63,15 @@ public class GameManager : MonoBehaviour
     bool dernierTirArrete = false;
     int indexReponseSelectionnee = -1;
     Question questionCourante;
+    Coroutine chronoTir;
 
     void Start()
     {
         if (tirMascotte == null)
             tirMascotte = Object.FindAnyObjectByType<TirMascotte>();
+
+        if (mascotteAutonome == null)
+            mascotteAutonome = Object.FindAnyObjectByType<MascotteAutonome>();
 
         if (questions == null || questions.Count == 0)
             InitialiserQuestionsParDefaut();
@@ -103,6 +109,8 @@ public class GameManager : MonoBehaviour
         if (panelQuestion != null) panelQuestion.SetActive(false);
         if (panelPause != null) panelPause.SetActive(false);
         if (panelFin != null) panelFin.SetActive(false);
+
+        PositionnerUIRoot(panelRegles1);
 
         if (tirMascotte != null)
             tirMascotte.ResetScore();
@@ -160,11 +168,23 @@ public class GameManager : MonoBehaviour
 
         MettreAJourHUD();
 
-        if (mascotteAnimator != null && !string.IsNullOrWhiteSpace(triggerTir))
-            mascotteAnimator.SetTrigger(triggerTir);
-
         if (tirMascotte != null)
-            tirMascotte.Tirer();
+            tirMascotte.ReplacerBallon();
+
+        if (mascotteAutonome != null)
+        {
+            mascotteAutonome.DemarrerSequence();
+        }
+        else
+        {
+            if (mascotteAnimator != null && !string.IsNullOrWhiteSpace(triggerTir))
+                mascotteAnimator.SetTrigger(triggerTir);
+
+            if (tirMascotte != null)
+                tirMascotte.Tirer();
+        }
+
+        DemarrerChronoTir();
     }
 
     public bool TryResolveShot(bool arrete)
@@ -174,6 +194,15 @@ public class GameManager : MonoBehaviour
 
         tirActif = false;
         dernierTirArrete = arrete;
+
+        if (chronoTir != null)
+        {
+            StopCoroutine(chronoTir);
+            chronoTir = null;
+        }
+
+        if (arrete && tirMascotte != null)
+            tirMascotte.AjouterPoints(pointsParArret);
 
         if (tirMascotte != null)
             tirMascotte.ReplacerBallon();
@@ -190,6 +219,8 @@ public class GameManager : MonoBehaviour
             LancerProchainTir();
             return;
         }
+
+        PositionnerUIRoot(panelQuestion);
 
         questionCourante = questions[Random.Range(0, questions.Count)];
         if (texteNumeroQuestion != null)
@@ -209,6 +240,35 @@ public class GameManager : MonoBehaviour
         indexReponseSelectionnee = -1;
         panelQuestion.SetActive(true);
         Debug.Log("[GameManager] PanelQuestion activé.");
+    }
+
+    void DemarrerChronoTir()
+    {
+        if (chronoTir != null)
+            StopCoroutine(chronoTir);
+
+        chronoTir = StartCoroutine(ChronoTir());
+    }
+
+    IEnumerator ChronoTir()
+    {
+        yield return new WaitForSeconds(delaiMaxTir);
+        if (tirActif)
+            TryResolveShot(false);
+    }
+
+    void PositionnerUIRoot(GameObject panel)
+    {
+        if (panel == null)
+            return;
+
+        var cam = Camera.main;
+        if (cam == null)
+            return;
+
+        var root = panel.transform.root;
+        root.position = cam.transform.position + cam.transform.forward * 2f;
+        root.rotation = Quaternion.LookRotation(root.position - cam.transform.position);
     }
 
     public void DebugMontrerQuestion()

@@ -15,17 +15,11 @@ public class MainsVR : MonoBehaviour
             if (gameManager != null && !gameManager.TryResolveShot(true))
                 return;
 
-            if (scriptMascotte != null)
-                scriptMascotte.AjouterPoints(400); // +400 pour l'arrêt
-
             if (effetConfettis != null)
             {
                 ContactPoint contact = collision.contacts[0];
                 Instantiate(effetConfettis, contact.point, Quaternion.identity);
             }
-
-            if (scriptMascotte != null)
-                scriptMascotte.Invoke("ReplacerBallon", 1.0f);
         }
     }
 }

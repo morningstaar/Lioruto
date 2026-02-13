@@ -29,19 +29,6 @@ public class TirMascotte : MonoBehaviour
         rbBallon.isKinematic = false; // On libère le ballon pour le tir
         Vector3 direction = (cibleBut.position - rbBallon.transform.position).normalized;
         rbBallon.AddForce(direction * 22f, ForceMode.Impulse);
-
-        // On lance un chrono : si au bout de 2s le quiz n'est pas là, on l'affiche
-        Invoke("AfficherQuizAutomatique", 2f);
-    }
-
-    void AfficherQuizAutomatique()
-    {
-        GameObject canvas = GameObject.Find("CanvasQuiz");
-        if (canvas != null && !canvas.activeSelf) 
-        {
-            canvas.SetActive(true);
-            rbBallon.isKinematic = true; // On fige le ballon s'il n'a pas été arrêté
-        }
     }
 
     public void ReplacerBallon()

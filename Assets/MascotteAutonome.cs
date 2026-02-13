@@ -4,43 +4,42 @@ public class MascotteAutonome : MonoBehaviour
 {
     public Rigidbody rbBallon;
     public Transform cibleBut;
-    public GameObject canvasQuiz; // Référence directe plus fiable que le .Find
-    public float vitesseCourse = 4.0f; // Un peu plus rapide pour le dynamisme
-
-    public GameManager gameManager;    
-    private Animator animator;
+    public Animator animator;
+   
+    public float vitesseCourse = 3.0f;
+    public float distanceArret = 0.6f;
     private bool enTrainDeCourir = false;
 
 
     void Start()
     {
         animator = GetComponent<Animator>();
-        // On cache le quiz proprement au début via le script au cas où
-        if(canvasQuiz) canvasQuiz.SetActive(false);
-        
-        Invoke("DemarrerCourse", 2f);
+        if (animator != null)
+            animator.SetBool("isRunning", false);
     }
 
-    void DemarrerCourse()
+    public void DemarrerSequence()
     {
         enTrainDeCourir = true;
-        if(animator) animator.SetBool("isRunning", true); 
+        if (animator != null)
+            animator.SetBool("isRunning", true);
     }
 
     void Update()
     {
         if (enTrainDeCourir && rbBallon != null)
         {
-            float distance = Vector3.Distance(transform.position, rbBallon.transform.position);
+            Vector3 cible = pointDeTir != null ? pointDeTir.position : rbBallon.transform.position;
+            Vector3 cibleSol = new Vector3(cible.x, transform.position.y, cible.z);
+            float distance = Vector3.Distance(transform.position, cibleSol);
 
-            // CORRECTION : "Tant que je suis loin, je cours"
-            if (distance > 1.6f) 
+            if (distance > distanceArret)
             {
-                transform.position = Vector3.MoveTowards(transform.position, rbBallon.transform.position, vitesseCourse * Time.deltaTime);
-                // Optionnel : Faire en sorte que Naruto regarde le ballon
-                transform.LookAt(new Vector3(rbBallon.transform.position.x, transform.position.y, rbBallon.transform.position.z));
+                transform.position = Vector3.MoveTowards(transform.position, cibleSol, vitesseCourse * Time.deltaTime);
+                if (cibleSol != transform.position)
+                    transform.rotation = Quaternion.LookRotation((cibleSol - transform.position).normalized);
             }
-            else 
+            else
             {
                 TerminerCourseEtTirer();
             }
@@ -50,31 +49,23 @@ public class MascotteAutonome : MonoBehaviour
     void TerminerCourseEtTirer()
     {
         enTrainDeCourir = false;
-        if(animator) {
+        if (animator != null)
+        {
             animator.SetBool("isRunning", false);
             animator.SetTrigger("Kick");
         }
-        
-        // On attend le moment de l'impact (0.9s selon ton animation)
-        Invoke("AppliquerForceBallon", 0.9f);
+       
+        Invoke("AppliquerForceBallon", 0.2f);
     }
 
     void AppliquerForceBallon()
     {
+        if (rbBallon == null || cibleBut == null)
+            return;
+
         rbBallon.isKinematic = false;
         // Direction vers le but
         Vector3 direction = (cibleBut.position - rbBallon.transform.position).normalized;
-        // Ajout d'une petite force vers le haut pour l'effet de tir (0.2f sur Y)
-        direction += Vector3.up * 0.2f; 
-        
-        // rbBallon.AddForce(direction * 22f, ForceMode.Impulse);
-        gameManager.LancerProchainTir();
-        
-        Invoke("OuvrirQuiz", 1.5f);
-    }
-
-    void OuvrirQuiz()
-    {
-        if(canvasQuiz) canvasQuiz.SetActive(true);
+        rbBallon.AddForce(direction * 22f, ForceMode.Impulse);
     }
 }
