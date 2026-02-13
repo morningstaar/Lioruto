@@ -1,27 +1,25 @@
 using UnityEngine;
 
-public class MainsVR : MonoBehaviour
+public class MainVR : MonoBehaviour
 {
-    public TirMascotte scriptMascotte;
-    public GameObject effetConfettis; 
+    public TirMascotte scriptTir; 
+    public GameObject canvasQuiz; // Glisse ton CanvasQuiz ici
 
     private void OnCollisionEnter(Collision collision)
     {
-        // Détection de la balle par les mains VR
         if (collision.gameObject.CompareTag("Ballon"))
         {
-            Debug.Log("ARRÊT !");
+            Debug.Log("ARRÊT ! Score +400");
             
-            if (scriptMascotte != null) 
-                scriptMascotte.AjouterPoints(400); // +400 pour l'arrêt
+            // 1. On donne les points
+            // if (scriptTir != null) scriptTir.AjouterPoints(400);
 
-            if (effetConfettis != null)
-            {
-                ContactPoint contact = collision.contacts[0];
-                Instantiate(effetConfettis, contact.point, Quaternion.identity);
-            }
+            // // 2. On affiche le Quiz
+            // if (canvasQuiz != null) canvasQuiz.SetActive(true);
 
-            scriptMascotte.Invoke("ReplacerBallon", 1.0f);
+            // // 3. On fige le ballon
+            // collision.gameObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            // collision.gameObject.GetComponent<Rigidbody>().isKinematic = true;
         }
     }
 }
