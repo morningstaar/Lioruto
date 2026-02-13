@@ -146,7 +146,7 @@ public class GameManager : MonoBehaviour
         LancerProchainTir();
     }
 
-    void LancerProchainTir()
+    public void LancerProchainTir()
     {
         if (tirsEffectues >= nombreDeTirs)
         {
